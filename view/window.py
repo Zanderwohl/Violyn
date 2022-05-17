@@ -22,6 +22,7 @@ class Window(Item):
         self.height = 1080
         self.width = 1920
 
+        # Will always be 0, 0 for Window object
         self.x = 0
         self.y = 0
 
