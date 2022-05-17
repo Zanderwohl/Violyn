@@ -33,10 +33,10 @@ class Window:
         self.resize(self.pixel_width, self.pixel_height, fullscreen=True)
         pygame.display.set_caption('Zandytext')
 
-        self.cursor_visible = False
-        pygame.mouse.set_visible(self.cursor_visible)
+        self.cursor = Cursor()
+        pygame.mouse.set_visible(False)
 
-        self.children = [Cursor()]
+        self.children = [self.cursor]
 
     def resize(self, width, height, fullscreen=False):
         self.pixel_width = width
@@ -63,6 +63,8 @@ class Window:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
+                if event.key == pygame.K_SLASH:
+                    self.cursor.toggle_visibility()
             if event.type == pygame.QUIT:
                 self.quit()
         if self.running:
