@@ -1,5 +1,7 @@
 import pygame
 
+from view.cursor import Cursor
+
 
 class Window:
 
@@ -7,8 +9,9 @@ class Window:
         pygame.init()
         self.running = True
 
-        self.fg = (0, 0, 0)
-        self.bg = (215, 205, 143)
+        self.fg = (81, 78, 55)         # Foreground color
+        self.bg = (215, 205, 143)   # Background color
+        self.tg = (60, 150, 60)     # Third color
 
         # Screen area in characters
         self.WIDTH = 80
@@ -30,6 +33,11 @@ class Window:
         self.resize(self.pixel_width, self.pixel_height, fullscreen=True)
         pygame.display.set_caption('Zandytext')
 
+        self.cursor_visible = False
+        pygame.mouse.set_visible(self.cursor_visible)
+
+        self.children = [Cursor()]
+
     def resize(self, width, height, fullscreen=False):
         self.pixel_width = width
         self.pixel_height = height
@@ -43,19 +51,29 @@ class Window:
         else:
             self.display_surface = pygame.display.set_mode((self.pixel_width, self.pixel_height))
 
-    def process_events(self):
-        self.display_surface.fill(self.bg)
+    def frame(self):
+        if self.running:
+            self.process_events()
+            if self.running:
+                self.draw_screen()
 
-        for event in pygame.event.get():
+    def process_events(self):
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.quit()
-                    return
             if event.type == pygame.QUIT:
                 self.quit()
-                return
+        if self.running:
+            for child in self.children:
+                child.update(events)
 
-        pygame.display.update()
+    def draw_screen(self):
+        self.display_surface.fill(self.bg)
+        for child in self.children:
+            child.draw(self.display_surface, self.fg, self.bg, self.tg)
+        pygame.display.flip()
 
     def quit(self):
         pygame.quit()
