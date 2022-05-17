@@ -33,6 +33,8 @@ class Window:
         pygame.display.set_caption('Violyn')
 
         self.cursor = Cursor(self)
+        self.cursor.hide()
+        self.cursor.set_pos(self.display_surface.get_size()[0] // 2, self.display_surface.get_size()[1] // 2)
         pygame.mouse.set_visible(False)
 
         self.children = [self.cursor]

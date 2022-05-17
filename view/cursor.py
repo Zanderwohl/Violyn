@@ -35,13 +35,24 @@ class Cursor:
         pygame.draw.line(display_surface, theme.fg, (self.x, self.y), (self.x, self.y))
         pygame.draw.circle(display_surface, theme.fg if not self.left_down else theme.tg, (self.x, self.y), self.radius)
 
+    def set_pos(self, x, y):
+        self.x = x
+        self.y = y
+        pygame.mouse.set_pos(x, y)
+
+    def hide(self):
+        self.visible = False
+
+    def show(self, x=None, y=None):
+        self.visible = True
+        if x is None:
+            x = self.x
+        if y is None:
+            y = self.y
+        self.set_pos(x, y)
+
     def toggle_visibility(self, x=None, y=None):
         if self.visible:
-            self.visible = False
+            self.hide()
         else:
-            self.visible = True
-            if x is None:
-                x = self.x
-            if y is None:
-                y = self.y
-            pygame.mouse.set_pos(x, y)
+            self.show(x=x, y=y)
