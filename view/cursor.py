@@ -1,7 +1,9 @@
 import pygame
 
+from view.item import Item
 
-class Cursor:
+
+class Cursor(Item):
     def __init__(self, parent):
         self.parent = parent
 
@@ -23,9 +25,7 @@ class Cursor:
             self.left_down = pygame.mouse.get_pressed()[0]
             self.right_down = pygame.mouse.get_pressed()[1]
 
-    def draw(self, display_surface, theme=None):
-        if theme is None:
-            theme = self.parent.theme
+    def draw(self, display_surface, theme):
         if not self.visible:
             return
         pygame.draw.line(display_surface, theme.fg, (self.x - self.length - self.offset, self.y), (self.x - self.offset, self.y))

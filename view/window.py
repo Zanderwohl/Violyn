@@ -2,13 +2,15 @@ import pygame
 
 from view.cursor import Cursor
 from view import theme
+from view.item import Item
 
 
-class Window:
+class Window(Item):
 
     def __init__(self):
         pygame.init()
         self.running = True
+        self.parent = None
 
         self.theme = theme.CREME
 
@@ -17,8 +19,11 @@ class Window:
         self.HEIGHT = 24
 
         # Screen area in pixels
-        self.pixel_height = 1080
-        self.pixel_width = 1920
+        self.height = 1080
+        self.width = 1920
+
+        self.x = 0
+        self.y = 0
 
         # Not real pixels. Aspect ratio of character.
         self.BLOCK_WIDTH = 5
@@ -29,7 +34,7 @@ class Window:
         self.block_pixel_height = 0
 
         self.display_surface = None
-        self.resize(self.pixel_width, self.pixel_height, fullscreen=True)
+        self.resize(self.width, self.height, fullscreen=True)
         pygame.display.set_caption('Violyn')
 
         self.cursor = Cursor(self)
@@ -37,20 +42,34 @@ class Window:
         self.cursor.set_pos(self.display_surface.get_size()[0] // 2, self.display_surface.get_size()[1] // 2)
         pygame.mouse.set_visible(False)
 
-        self.children = [self.cursor]
+        self.children = {'cursor': self.cursor}
+        self.views = {}
+        self.view_id = 0
 
     def resize(self, width, height, fullscreen=False):
-        self.pixel_width = width
-        self.pixel_height = height
-
         # Estimate real pixels sizes of each character. Based on width. Excess height can be given a scrollbar.
         self.block_pixel_width = width // self.WIDTH  # TODO: Subtract scrollbar width?
         self.block_pixel_height = round(((width / self.WIDTH) / self.BLOCK_WIDTH) * self.BLOCK_HEIGHT)
 
         if fullscreen:
             self.display_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            self.width, self.height = pygame.display.get_window_size()
         else:
-            self.display_surface = pygame.display.set_mode((self.pixel_width, self.pixel_height))
+            self.width = width
+            self.height = height
+            self.display_surface = pygame.display.set_mode((self.width, self.height))
+
+    def add_view(self, view):
+        key = f'View {self.view_id}'
+        self.view_id += 1
+        self.children[key] = view
+        self.views[key] = view
+        view.parent = self
+        return key
+
+    def remove_view(self, view_key):
+        del self.views[view_key]
+        del self.children[view_key]
 
     def frame(self):
         if self.running:
@@ -69,13 +88,13 @@ class Window:
             if event.type == pygame.QUIT:
                 self.quit()
         if self.running:
-            for child in self.children:
+            for _key, child in self.children.items():
                 child.update(events)
 
     def draw_screen(self):
         self.display_surface.fill(self.theme.bg)
-        for child in self.children:
-            child.draw(self.display_surface)
+        for _key, child in self.children.items():
+            child.draw(self.display_surface, self.theme)
         pygame.display.flip()
 
     def quit(self):
