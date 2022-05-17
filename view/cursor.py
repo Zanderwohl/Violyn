@@ -2,7 +2,9 @@ import pygame
 
 
 class Cursor:
-    def __init__(self):
+    def __init__(self, parent):
+        self.parent = parent
+
         self.x = 0
         self.y = 0
 
@@ -21,15 +23,17 @@ class Cursor:
             self.left_down = pygame.mouse.get_pressed()[0]
             self.right_down = pygame.mouse.get_pressed()[1]
 
-    def draw(self, display_surface, fg, bg, tg):
+    def draw(self, display_surface, theme=None):
+        if theme is None:
+            theme = self.parent.theme
         if not self.visible:
             return
-        pygame.draw.line(display_surface, fg, (self.x - self.length - self.offset, self.y), (self.x - self.offset, self.y))
-        pygame.draw.line(display_surface, fg, (self.x + self.length + self.offset, self.y), (self.x + self.offset, self.y))
-        pygame.draw.line(display_surface, fg, (self.x, self.y - self.length - self.offset), (self.x, self.y - self.offset))
-        pygame.draw.line(display_surface, fg, (self.x, self.y + self.length + self.offset), (self.x, self.y + self.offset))
-        pygame.draw.line(display_surface, fg, (self.x, self.y), (self.x, self.y))
-        pygame.draw.circle(display_surface, fg if not self.left_down else tg, (self.x, self.y), self.radius)
+        pygame.draw.line(display_surface, theme.fg, (self.x - self.length - self.offset, self.y), (self.x - self.offset, self.y))
+        pygame.draw.line(display_surface, theme.fg, (self.x + self.length + self.offset, self.y), (self.x + self.offset, self.y))
+        pygame.draw.line(display_surface, theme.fg, (self.x, self.y - self.length - self.offset), (self.x, self.y - self.offset))
+        pygame.draw.line(display_surface, theme.fg, (self.x, self.y + self.length + self.offset), (self.x, self.y + self.offset))
+        pygame.draw.line(display_surface, theme.fg, (self.x, self.y), (self.x, self.y))
+        pygame.draw.circle(display_surface, theme.fg if not self.left_down else theme.tg, (self.x, self.y), self.radius)
 
     def toggle_visibility(self, x=None, y=None):
         if self.visible:

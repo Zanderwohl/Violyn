@@ -1,6 +1,7 @@
 import pygame
 
 from view.cursor import Cursor
+from view import theme
 
 
 class Window:
@@ -9,9 +10,7 @@ class Window:
         pygame.init()
         self.running = True
 
-        self.fg = (81, 78, 55)         # Foreground color
-        self.bg = (215, 205, 143)   # Background color
-        self.tg = (60, 150, 60)     # Third color
+        self.theme = theme.CREME
 
         # Screen area in characters
         self.WIDTH = 80
@@ -31,9 +30,9 @@ class Window:
 
         self.display_surface = None
         self.resize(self.pixel_width, self.pixel_height, fullscreen=True)
-        pygame.display.set_caption('Zandytext')
+        pygame.display.set_caption('Violyn')
 
-        self.cursor = Cursor()
+        self.cursor = Cursor(self)
         pygame.mouse.set_visible(False)
 
         self.children = [self.cursor]
@@ -72,9 +71,9 @@ class Window:
                 child.update(events)
 
     def draw_screen(self):
-        self.display_surface.fill(self.bg)
+        self.display_surface.fill(self.theme.bg)
         for child in self.children:
-            child.draw(self.display_surface, self.fg, self.bg, self.tg)
+            child.draw(self.display_surface)
         pygame.display.flip()
 
     def quit(self):
