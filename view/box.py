@@ -18,6 +18,19 @@ class Box(Item):
         absolute_x, absolute_y = self.absolute_coords()
         color = theme.hl if self.level % 2 == 0 else theme.ll
         pygame.draw.rect(display_surface, color, (absolute_x, absolute_y, self.width, self.height))
+        if self.is_hovered:
+            pygame.draw.line(display_surface, theme.hov, (absolute_x, absolute_y),
+                             (absolute_x + self.width, absolute_y))
+            pygame.draw.line(display_surface, theme.hov, (absolute_x, absolute_y),
+                             (absolute_x, absolute_y + self.height))
+            pygame.draw.rect(display_surface, theme.hov, (absolute_x, absolute_y, 5, 5))
+        if self.is_focused:
+            pygame.draw.line(display_surface, theme.foc, (absolute_x + self.width, absolute_y + self.height),
+                             (absolute_x + self.width, absolute_y))
+            pygame.draw.line(display_surface, theme.foc, (absolute_x + self.width, absolute_y + self.height),
+                             (absolute_x, absolute_y + self.height))
+            pygame.draw.rect(display_surface, theme.foc,
+                             (absolute_x + self.width - 5, absolute_y + self.height - 5, 5, 5))
         for key, child in self.children.items():
             child.draw(self.display_surface(), theme)
 

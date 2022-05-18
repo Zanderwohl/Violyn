@@ -39,6 +39,9 @@ class Window(Item):
         self.cursor.set_pos(self._display_surface.get_size()[0] // 2, self._display_surface.get_size()[1] // 2)
         pygame.mouse.set_visible(False)
 
+        self.current_hover = None
+        self.current_focus = None
+
         self.add_child(self.cursor)
         self.views = {}
         self.view_id = 0
@@ -81,6 +84,17 @@ class Window(Item):
                     self.quit()
                 if event.key == pygame.K_SLASH:
                     self.cursor.toggle_visibility()
+            if event.type == pygame.MOUSEMOTION:
+                if self.cursor.visible:
+                    position = pygame.mouse.get_pos()
+                    hits = self.list_hits(position)
+                    prev_hover = self.current_hover
+                    if prev_hover is not None:
+                        prev_hover.hover_out()
+                    if len(hits) > 0:
+                        top_hit = hits[0]
+                        self.current_hover = top_hit
+                        top_hit.hover_in()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.cursor.visible:
                     position = pygame.mouse.get_pos()
@@ -97,12 +111,19 @@ class Window(Item):
                     if len(hits) > 0:
                         top_hit = hits[0]
                         if self.click_start == top_hit:
+                            self.set_focus(top_hit)
                             top_hit.click(position)
             if event.type == pygame.QUIT:
                 self.quit()
         if self.running:
             for _key, child in self.children.items():
                 child.update(events)
+
+    def set_focus(self, element):
+        if self.current_focus is not None:
+            self.current_focus.focus_out()
+        self.current_focus = element
+        self.current_focus.focus_in()
 
     def draw_screen(self):
         self._display_surface.fill(self.theme.bg)

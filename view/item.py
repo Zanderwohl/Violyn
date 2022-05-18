@@ -3,6 +3,9 @@
 class Item:
     def __init__(self, parent=None):
         self.clickable = False
+        self.is_focused = False
+        self.is_hovered = False
+
         self.visible = True
         self.children = {}
         self.child_id = 0
@@ -76,3 +79,15 @@ class Item:
         my_x, my_y = self.absolute_coords()
         rel_x, rel_y = x - my_x, y - my_y
         self.click_handler((rel_x, rel_y))
+
+    def hover_in(self):
+        self.is_hovered = True
+
+    def hover_out(self):
+        self.is_hovered = False
+
+    def focus_in(self):
+        self.is_focused = True
+
+    def focus_out(self):
+        self.is_focused = False
