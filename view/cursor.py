@@ -5,10 +5,7 @@ from view.item import Item
 
 class Cursor(Item):
     def __init__(self, parent):
-        self.parent = parent
-
-        self.x = 0
-        self.y = 0
+        super().__init__(parent=parent)
 
         self.offset = 10
         self.length = 30
@@ -16,8 +13,6 @@ class Cursor(Item):
 
         self.left_down = False
         self.right_down = False
-
-        self.visible = True
 
     def update(self, _events):
         if self.visible:

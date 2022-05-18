@@ -3,16 +3,10 @@ import pygame
 from view.item import Item
 
 
-class View(Item):
+class Box(Item):
     def __init__(self, parent=None):
-        self.children = {}
+        super().__init__(parent=parent)
         self.parent = parent
-
-        self.x = 0
-        self.y = 0
-
-        self.width = 0
-        self.height = 0
 
         self.border = 2
 
@@ -50,3 +44,12 @@ class View(Item):
             raise Exception(f'Width is greater than parent width! ({new_width} > {self.parent.width})')
         self.width = new_width
         self.height = new_height
+
+    def orphan_self(self):
+        invert_op = getattr(self.parent, "remove_view", None)
+        if callable(invert_op):
+            self.parent.remove_view(self.my_id)
+            self.my_id = None
+            self.parent = None
+        else:
+            super().orphan_self()

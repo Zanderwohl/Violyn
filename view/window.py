@@ -9,8 +9,8 @@ class Window(Item):
 
     def __init__(self):
         pygame.init()
+        super().__init__()
         self.running = True
-        self.parent = None
 
         self.theme = theme.CREME
 
@@ -22,10 +22,6 @@ class Window(Item):
         self.height = 1080
         self.width = 1920
 
-        # Will always be 0, 0 for Window object
-        self.x = 0
-        self.y = 0
-
         # Not real pixels. Aspect ratio of character.
         self.BLOCK_WIDTH = 5
         self.BLOCK_HEIGHT = 7
@@ -34,16 +30,16 @@ class Window(Item):
         self.block_pixel_width = 0
         self.block_pixel_height = 0
 
-        self.display_surface = None
+        self._display_surface = None
         self.resize(self.width, self.height, fullscreen=True)
         pygame.display.set_caption('Violyn')
 
         self.cursor = Cursor(self)
         self.cursor.hide()
-        self.cursor.set_pos(self.display_surface.get_size()[0] // 2, self.display_surface.get_size()[1] // 2)
+        self.cursor.set_pos(self._display_surface.get_size()[0] // 2, self._display_surface.get_size()[1] // 2)
         pygame.mouse.set_visible(False)
 
-        self.children = {'cursor': self.cursor}
+        self.add_child(self.cursor)
         self.views = {}
         self.view_id = 0
 
@@ -53,24 +49,21 @@ class Window(Item):
         self.block_pixel_height = round(((width / self.WIDTH) / self.BLOCK_WIDTH) * self.BLOCK_HEIGHT)
 
         if fullscreen:
-            self.display_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+            self._display_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
             self.width, self.height = pygame.display.get_window_size()
         else:
             self.width = width
             self.height = height
-            self.display_surface = pygame.display.set_mode((self.width, self.height))
+            self._display_surface = pygame.display.set_mode((self.width, self.height))
 
     def add_view(self, view):
-        key = f'View {self.view_id}'
-        self.view_id += 1
-        self.children[key] = view
+        key = super().add_child(view)
         self.views[key] = view
-        view.parent = self
         return key
 
     def remove_view(self, view_key):
+        super().remove_child(view_key)
         del self.views[view_key]
-        del self.children[view_key]
 
     def frame(self):
         if self.running:
@@ -93,9 +86,10 @@ class Window(Item):
                 child.update(events)
 
     def draw_screen(self):
-        self.display_surface.fill(self.theme.bg)
-        for _key, child in self.children.items():
-            child.draw(self.display_surface, self.theme)
+        self._display_surface.fill(self.theme.bg)
+        for key in reversed(self.children):
+            child = self.children[key]
+            child.draw(self._display_surface, self.theme)
         pygame.display.flip()
 
     def quit(self):
