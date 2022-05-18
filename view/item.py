@@ -1,5 +1,4 @@
 
-
 class Item:
     def __init__(self, parent=None):
         self.clickable = False
@@ -8,6 +7,7 @@ class Item:
 
         self.visible = True
         self.children = {}
+        self.children_keys = []
         self.child_id = 0
         self.x = 0
         self.y = 0
@@ -40,10 +40,12 @@ class Item:
         self.children[key] = child
         child.parent = self
         child.set_level(self.level + 1)
+        self.children_keys = list(self.children)
         return key
 
     def remove_child(self, child_id):
         del self.children[child_id]
+        self.children_keys = list(self.children)
 
     def set_level(self, level):
         self.level = level
@@ -91,3 +93,32 @@ class Item:
 
     def focus_out(self):
         self.is_focused = False
+
+    def previous_sibling(self, focusable=False):
+        return self.parent.previous_child(self.my_id, focusable)
+
+    def next_sibling(self, focusable=False):
+        return self.parent.next_child(self.my_id, focusable)
+
+    def next_child(self, child_key, focusable=False):
+        try:
+            next_key = self.children_keys[self.children_keys.index(child_key) + 1]
+        except (ValueError, IndexError):
+            next_key = self.children_keys[0]
+        candidate = self.children[next_key]
+        return candidate if candidate.clickable or not focusable else self.next_child(next_key, focusable=focusable)
+
+    def previous_child(self, child_key, focusable=False):
+        try:
+            prev_key = self.children_keys[self.children_keys.index(child_key) - 1]
+        except (ValueError, IndexError):
+            prev_key = self.children_keys[-1]
+        candidate = self.children[prev_key]
+        return candidate if candidate.clickable or not focusable else self.previous_child(prev_key, focusable=focusable)
+
+    def first_child(self, focusable=False):
+        if len(self.children_keys) == 0:
+            return None
+        last_key = self.children_keys[-1]
+        first_child = self.next_child(last_key, focusable=focusable)
+        return first_child

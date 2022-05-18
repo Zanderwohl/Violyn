@@ -84,6 +84,29 @@ class Window(Item):
                     self.quit()
                 if event.key == pygame.K_SLASH:
                     self.cursor.toggle_visibility()
+                if event.key == pygame.K_LEFT:
+                    if self.current_focus is None:
+                        self.focus_first_available()
+                    else:
+                        self.set_focus(self.current_focus.previous_sibling(focusable=True))
+                if event.key == pygame.K_RIGHT:
+                    if self.current_focus is None:
+                        self.focus_first_available()
+                    else:
+                        self.set_focus(self.current_focus.next_sibling(focusable=True))
+                if event.key == pygame.K_DOWN:
+                    if self.current_focus is None:
+                        self.focus_first_available()
+                    else:
+                        first_child = self.current_focus.first_child(focusable=True)
+                        if first_child is not None:
+                            self.set_focus(first_child)
+                if event.key == pygame.K_UP:
+                    if self.current_focus is None:
+                        self.focus_first_available()
+                    else:
+                        if self.current_focus.parent.clickable:
+                            self.set_focus(self.current_focus.parent)
             if event.type == pygame.MOUSEMOTION:
                 if self.cursor.visible:
                     position = pygame.mouse.get_pos()
@@ -124,6 +147,10 @@ class Window(Item):
             self.current_focus.focus_out()
         self.current_focus = element
         self.current_focus.focus_in()
+
+    def focus_first_available(self):
+        first_clickable_child = self.first_child(focusable=True)
+        self.set_focus(first_clickable_child)
 
     def draw_screen(self):
         self._display_surface.fill(self.theme.bg)
