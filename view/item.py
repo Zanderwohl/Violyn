@@ -15,6 +15,8 @@ class Item:
         self._display_surface = None
         self.level = 0
 
+        self.click_handler = lambda position: print(position)
+
     def absolute_coords(self):
         if self.parent is None:
             return 0, 0
@@ -49,3 +51,28 @@ class Item:
         self.parent.remove_child(self.my_id)
         self.my_id = None
         self.parent = None
+
+    def is_inside(self, position):
+        x, y = position
+        my_x, my_y = self.absolute_coords()
+        return my_x <= x <= my_x + self.width and my_y <= y <= my_y + self.height
+
+    def list_hits(self, position):
+        hits = []
+        if self.is_inside(position):
+            for key in reversed(self.children):
+                child = self.children[key]
+                if not child.clickable:
+                    continue
+                child_hits = child.list_hits(position)
+                if child_hits is not None and len(child_hits) > 0:
+                    hits.extend(child_hits)
+            if self.clickable:
+                hits.append(self)
+        return hits
+
+    def click(self, position):
+        x, y = position
+        my_x, my_y = self.absolute_coords()
+        rel_x, rel_y = x - my_x, y - my_y
+        self.click_handler((rel_x, rel_y))

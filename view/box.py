@@ -7,6 +7,7 @@ class Box(Item):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
         self.parent = parent
+        self.clickable = True
 
         self.border = 2
 
@@ -15,9 +16,10 @@ class Box(Item):
 
     def draw(self, display_surface, theme):
         absolute_x, absolute_y = self.absolute_coords()
-        pygame.draw.rect(display_surface, theme.hl, (absolute_x, absolute_y, self.width, self.height))
-        for key, child in self.children:
-            child.draw()
+        color = theme.hl if self.level % 2 == 0 else theme.ll
+        pygame.draw.rect(display_surface, color, (absolute_x, absolute_y, self.width, self.height))
+        for key, child in self.children.items():
+            child.draw(self.display_surface(), theme)
 
     def resize(self, top_left=None, bottom_right=None, size=None):
         if top_left is None:

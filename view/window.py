@@ -31,7 +31,7 @@ class Window(Item):
         self.block_pixel_height = 0
 
         self._display_surface = None
-        self.resize(self.width, self.height, fullscreen=True)
+        self.resize(self.width, self.height, fullscreen=False)
         pygame.display.set_caption('Violyn')
 
         self.cursor = Cursor(self)
@@ -42,6 +42,8 @@ class Window(Item):
         self.add_child(self.cursor)
         self.views = {}
         self.view_id = 0
+
+        self.click_start = None
 
     def resize(self, width, height, fullscreen=False):
         # Estimate real pixels sizes of each character. Based on width. Excess height can be given a scrollbar.
@@ -79,6 +81,23 @@ class Window(Item):
                     self.quit()
                 if event.key == pygame.K_SLASH:
                     self.cursor.toggle_visibility()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.cursor.visible:
+                    position = pygame.mouse.get_pos()
+                    hits = self.list_hits(position)
+                    if len(hits) > 0:
+                        top_hit = hits[0]
+                        self.click_start = top_hit
+                    else:
+                        self.click_start = None
+            if event.type == pygame.MOUSEBUTTONUP:
+                if self.cursor.visible:
+                    position = pygame.mouse.get_pos()
+                    hits = self.list_hits(position)
+                    if len(hits) > 0:
+                        top_hit = hits[0]
+                        if self.click_start == top_hit:
+                            top_hit.click(position)
             if event.type == pygame.QUIT:
                 self.quit()
         if self.running:
