@@ -94,14 +94,14 @@ class Window(Item):
                         self.focus_first_available()
                     else:
                         self.set_focus(self.current_focus.next_sibling(focusable=True))
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_UP:
                     if self.current_focus is None:
                         self.focus_first_available()
                     else:
                         first_child = self.current_focus.first_child(focusable=True)
                         if first_child is not None:
                             self.set_focus(first_child)
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_DOWN:
                     if self.current_focus is None:
                         self.focus_first_available()
                     else:
